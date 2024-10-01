@@ -1,67 +1,57 @@
-// controllers/trainerController.js
+const { get } = require('mongoose');
 const Training = require('../model/training');
-const Scores = require('../model/scores');
 
-// Controller to handle POST request for entering training score
-exports.enterTrainingScore = async (req, res) => {
-  const {
-    emp_id,
-    emp_name,
-    Training_id,
-    Training_name,
-    Trainer_name,
-    scores,
-    comments,
-    coding,
-    requirements,
-    documentation
-  } = req.body;
+// Add Training Controller
+const addTraining = async (req, res) => {
+  const { Training_id, Training_name, Trainer_name } = req.body;
 
   try {
-    // Step 1: Check if the training entry exists, if not create one
-    let training = await Training.findOne({ e_id: emp_id, T_id: Training_id });
-
-    if (!training) {
-      training = new Training({
-        emp_id: emp_id,
-        emp_name: emp_name,
-        Training_id: Training_id,
-        Training_name: Training_name,
-        Trainer_name: Trainer_name
-      });
-
-      await training.save(); // Save the training information if not exists
-    }
-
-    // Step 2: Save the scores in the Scores collection
-    const score = new Scores({
-        emp_id: emp_id,
-        Training_id: Training_id,
-        Trainer_name: Trainer_name,
-        scores,
-        comments,
-        coding,
-        requirements,
-        documentation
+    const training = new Training({
+      Training_id,
+      Training_name,
+      Trainer_name,
     });
 
-    await score.save(); // Save the score information
-
-    // Respond with success message
-    res.status(201).json({
-      status: 'success',
-      message: 'Training and scores saved successfully',
-      data: {
-        training,
-        score
-      }
-    });
+    await training.save();
+    res.status(201).json(training);
   } catch (error) {
-    // Respond with an error message
-    res.status(500).json({
-      status: 'fail',
-      message: 'An error occurred',
-      error: error.message
-    });
+    console.error('Error adding training:', error);
+    res.status(400).json({ message: 'Failed to add training', error: error.message });
   }
+};
+const getAllTraining=async(req,res)=>{
+    try {
+        const count = await Training.countDocuments();
+        res.json({ count });
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching training count' });
+      }
+}
+
+const getAllTrainers=async(req,res)=>{
+    try {
+        const uniqueTrainers = await Training.aggregate([
+          {
+            $group: {
+              _id: "$Trainer_name", // Group by Trainer_name
+              count: { $sum: 1 } // Count each occurrence of the Trainer_name
+            }
+          },
+          {
+            $count: "count" // Count the unique trainers
+          }
+        ]);
+    
+        // Check if uniqueTrainers is empty
+        const totalTrainers = uniqueTrainers.length > 0 ? uniqueTrainers[0].count : 0;
+    
+        res.status(200).json({ count: totalTrainers }); // Send count in JSON
+      } catch (error) {
+        console.error('Error counting unique trainers:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+}
+
+module.exports = {
+  addTraining,getAllTraining,getAllTrainers
 };
