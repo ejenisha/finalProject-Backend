@@ -18,7 +18,7 @@ const addEmployee = async (req, res) => {
     res.status(400).json({ message: 'Failed to add employee', error: error.message });
   }
 };
-const getAllEmployee=async(req,res)=>{
+const getAllEmployeeCount=async(req,res)=>{
     try {
         const count = await Employees.countDocuments();
         res.json({ count });
@@ -26,7 +26,15 @@ const getAllEmployee=async(req,res)=>{
         res.status(500).json({ message: 'Error fetching employee count' });
       }
 }
-
+const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await Employees.find({}, 'emp_id emp_name'); // Fetch emp_id and emp_name
+    res.json(employees);
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    res.status(500).json({ message: 'Error fetching employees' });
+  }
+};
 module.exports = {
-  addEmployee,getAllEmployee
+  addEmployee,getAllEmployeeCount,getAllEmployees
 };

@@ -1,7 +1,8 @@
 const express=require('express')
-const trainingController=require('../controller/trainingController')
+const trainingController=require('../controller/trainingcontroller')
 const router=express.Router()
 router.post('/addTraining',trainingController.addTraining)
-router.get('/getTraining',trainingController.getAllTraining)
-router.get('/AllTrainers',trainingController.getAllTrainers)
+router.get('/AllTrainingcount',trainingController.getAllTrainingCount)
+router.get('/AllTrainersCount',trainingController.getAllTrainersCount)
+router.get('/getAllTrainings',trainingController.getAllTrainings)
 module.exports=router

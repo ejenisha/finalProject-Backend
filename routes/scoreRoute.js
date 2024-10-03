@@ -10,4 +10,6 @@ router.get('/viewscore',scoreController.getAllScores)
 router.get('/emptrainingcount',scoreController.getemployeeTrainingCount)
 router.get('/projectscores',scoreController.projectscores)
 router.get('/avgscores',scoreController.avgscores)
+router.get('/getReport',scoreController.getEmployeeReport)
+router.get('/getTopScores',scoreController.getTopScoresByTraining)
 module.exports = router;

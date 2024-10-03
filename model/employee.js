@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 // Define the Scores Schema
 const employeeSchema = new mongoose.Schema({
-  emp_id: { type: String, required: true, ref: 'Training' },
+  emp_id: { type: String,unique:true, required: true, ref: 'Training' },
   emp_name:{type:String,required:true}, // Foreign key reference
   designation:{type:String,required:true}
 });

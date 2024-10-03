@@ -19,7 +19,7 @@ const addTraining = async (req, res) => {
     res.status(400).json({ message: 'Failed to add training', error: error.message });
   }
 };
-const getAllTraining=async(req,res)=>{
+const getAllTrainingCount=async(req,res)=>{
     try {
         const count = await Training.countDocuments();
         res.json({ count });
@@ -28,7 +28,7 @@ const getAllTraining=async(req,res)=>{
       }
 }
 
-const getAllTrainers=async(req,res)=>{
+const getAllTrainersCount=async(req,res)=>{
     try {
         const uniqueTrainers = await Training.aggregate([
           {
@@ -51,7 +51,16 @@ const getAllTrainers=async(req,res)=>{
         res.status(500).json({ message: 'Internal Server Error' });
       }
 }
+const getAllTrainings = async (req, res) => {
+  try {
+    const trainings = await Training.find({}, 'Training_id Training_name Trainer_name'); // Fetch emp_id and emp_name
+    res.json(trainings);
+  } catch (error) {
+    console.error('Error fetching trainings:', error);
+    res.status(500).json({ message: 'Error fetching trainings' });
+  }
+};
 
 module.exports = {
-  addTraining,getAllTraining,getAllTrainers
+  addTraining,getAllTrainingCount,getAllTrainersCount,getAllTrainings
 };

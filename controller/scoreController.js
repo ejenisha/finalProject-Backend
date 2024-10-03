@@ -1,6 +1,6 @@
 // controllers/trainerController.js
 const Scores = require('../model/scores');
-
+const Employees=require('../model/employee')
 // Controller to handle POST request for entering training score
 exports.enterTrainingScore = async (req, res) => {
   const {
@@ -157,3 +157,114 @@ exports.avgscores=async(req,res)=>{
     res.status(500).json({ message: 'Internal Server Error' });
   }
 }
+exports. getEmployeeReport = async (req, res) => {
+  const { emp_id, emp_name } = req.query;
+
+  try {
+    // Fetch employee details
+    const employee = await Employees.findOne({ emp_id, emp_name });
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // Fetch the training scores based on employee ID
+    const scores = await Scores.find({ emp_id });
+
+    if (scores.length === 0) {
+      return res.status(404).json({ message: 'No training records found for this employee' });
+    }
+
+    // Send employee details and their relevant training scores
+    const response = {
+      emp_id: employee.emp_id,
+      emp_name: employee.emp_name,
+      designation: employee.designation,
+      trainings: scores.map((score) => ({
+        Training_id: score.Training_id,
+        Training_name: score.Training_name,
+        Trainer_name: score.Trainer_name,
+        project_scores: score.project_scores,
+        requirements: score.requirements,
+        time: score.time,
+        hackerrank: score.hackerrank,
+      })),
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching employee report:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+exports.getTopScoresByTraining = async (req, res) => {
+  try {
+    const topScores = await Scores.aggregate([
+      {
+        // Group by Training_id and get the maximum project score for each group
+        $group: {
+          _id: {
+            Training_id: "$Training_id",
+            Training_name: "$Training_name"
+          },
+          maxScore: { $max: "$project_scores" }
+        }
+      },
+      {
+        // Join back with the Scores collection to get employee names for max scores
+        $lookup: {
+          from: "scores", // The name of the Scores collection
+          let: { trainingId: "$_id.Training_id", maxScore: "$maxScore" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$Training_id", "$$trainingId"] },
+                    { $eq: ["$project_scores", "$$maxScore"] }
+                  ]
+                }
+              }
+            },
+            {
+              // Project the fields we want to return
+              $project: {
+                emp_name: 1,
+                project_scores: 1
+              }
+            }
+          ],
+          as: "topScorers"
+        }
+      },
+      {
+        // Unwind the topScorers array to flatten the results
+        $unwind: "$topScorers"
+      },
+      {
+        // Project the final output
+        $project: {
+          _id: 0,
+          Training_id: "$_id.Training_id",
+          Training_name: "$_id.Training_name",
+          emp_name: "$topScorers.emp_name",
+          project_scores: "$topScorers.project_scores"
+        }
+      }
+    ]);
+
+    // Send the result as a JSON response
+    res.status(200).json({
+      success: true,
+      data: topScores
+    });
+  } catch (error) {
+    console.error("Error fetching top scores by training:", error);
+    // Send an error response in JSON format
+    res.status(500).json({
+      success: false,
+      message: "Error fetching top scores by training",
+      error: error.message
+    });
+  }
+};
