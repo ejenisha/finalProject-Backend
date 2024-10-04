@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 // Define the Scores Schema
 const scoresSchema = new mongoose.Schema({
   emp_id: { type: String, required: true, ref: 'Employees' },
-  emp_name:{type:String,required:true,ref: 'Employees' }, // Foreign key reference
+  emp_name:{type:String,required:true,ref: 'Employees' }, 
   Training_id: { type: String, required: true, ref: 'Training' },
-  Training_name:{type:String,required:true,ref: 'Training'}, // Foreign key reference
-  Trainer_name: { type: String, required: true, ref: 'Training' }, // Foreign key reference
+  Training_name:{type:String,required:true,ref: 'Training'},
+  Trainer_name: { type: String, required: true, ref: 'Training' }, 
   project_scores: { type: Number, required: true },
   comments: { type: String, required: true },
   time: { type: Number, required: true },

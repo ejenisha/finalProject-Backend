@@ -1,8 +1,8 @@
-const { get } = require('mongoose');
+
 const Training = require('../model/training');
 
 // Add Training Controller
-const addTraining = async (req, res) => {
+exports.addTraining = async (req, res) => {
   const { Training_id, Training_name, Trainer_name } = req.body;
 
   try {
@@ -19,7 +19,9 @@ const addTraining = async (req, res) => {
     res.status(400).json({ message: 'Failed to add training', error: error.message });
   }
 };
-const getAllTrainingCount=async(req,res)=>{
+
+//Get Training Count
+exports.getAllTrainingCount=async(req,res)=>{
     try {
         const count = await Training.countDocuments();
         res.json({ count });
@@ -28,7 +30,8 @@ const getAllTrainingCount=async(req,res)=>{
       }
 }
 
-const getAllTrainersCount=async(req,res)=>{
+// Get Trainers Count
+exports.getAllTrainersCount=async(req,res)=>{
     try {
         const uniqueTrainers = await Training.aggregate([
           {
@@ -51,9 +54,12 @@ const getAllTrainersCount=async(req,res)=>{
         res.status(500).json({ message: 'Internal Server Error' });
       }
 }
-const getAllTrainings = async (req, res) => {
+
+//Get all Trainings
+exports.getAllTrainings = async (req, res) => {
   try {
-    const trainings = await Training.find({}, 'Training_id Training_name Trainer_name'); // Fetch emp_id and emp_name
+    // Fetch all relevant fields, including progress
+    const trainings = await Training.find({}, 'Training_id Training_name Trainer_name progress');
     res.json(trainings);
   } catch (error) {
     console.error('Error fetching trainings:', error);
@@ -61,6 +67,71 @@ const getAllTrainings = async (req, res) => {
   }
 };
 
-module.exports = {
-  addTraining,getAllTrainingCount,getAllTrainersCount,getAllTrainings
+
+//Update the progress of Trainings
+exports. updateTrainingProgress = async (req, res) => {
+  const { Training_id } = req.params;
+  const { progress } = req.body;
+
+  try {
+    const updatedTraining = await Training.findOneAndUpdate(
+      { Training_id }, // query
+      { progress }, // update data
+      { new: true } // return the updated document
+    );
+
+    if (!updatedTraining) {
+      return res.status(404).send({ message: 'Training not found' });
+    }
+
+    console.log('Updated Training:', updatedTraining); // log the result
+
+    res.status(200).send({ message: 'Training progress updated successfully' });
+  } catch (error) {
+    console.error('Error updating training progress:', error);
+    res.status(500).send({ message: 'Error updating training progress' });
+  }
 };
+ 
+//edit training
+exports. editTraining = async (req, res) => {
+  const { Training_id } = req.params; // Get Training_id from URL parameters
+  const { Training_name, Trainer_name } = req.body; // Get fields to update from request body
+
+  // Create an object to hold updates
+  const updates = {};
+
+  // Only add fields to updates object if they are provided
+  if (Training_name) {
+    updates.Training_name = Training_name;
+  }
+  if (Trainer_name) {
+    updates.Trainer_name = Trainer_name;
+  }
+
+  // Check if there are no updates provided
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: 'At least one field must be provided for update.' });
+  }
+
+  try {
+    // Find the training by Training_id and update the fields
+    const updatedTraining = await Training.findOneAndUpdate(
+      { Training_id },
+      updates,
+      { new: true } // Return the updated document
+    );
+
+    // Check if the training was found and updated
+    if (!updatedTraining) {
+      return res.status(404).json({ message: 'Training not found' });
+    }
+
+    // Return the updated training details
+    return res.status(200).json(updatedTraining);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+

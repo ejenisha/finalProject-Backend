@@ -5,7 +5,7 @@ const accessRoutes = require('../controller/accessController'); // Import login 
 const router = express.Router();
 
 // POST /login route
-router.post('/login', accessRoutes.login);
-router.post('/register',accessRoutes.createUser)
+router.post('/login', accessRoutes.login); //login
+router.post('/register',accessRoutes.createTrainer) //add trainers
 
 module.exports = router;
