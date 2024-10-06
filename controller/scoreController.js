@@ -165,7 +165,7 @@ exports. getEmployeeReport = async (req, res) => {
 
   try {
     // Fetch employee details
-    const employee = await Employees.findOne({ emp_id, emp_name });
+    const employee = await Scores.findOne({ emp_id, emp_name });
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
@@ -273,3 +273,19 @@ exports.getTopScoresByTraining = async (req, res) => {
     });
   }
 };
+exports.employeeId=async (req, res) => {
+  try {
+    const employees = await Scores.find({}, 'emp_id emp_name'); // Fetch only emp_id and emp_name
+    res.status(200).json(employees);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching employee IDs' });
+  }
+};
+exports. getAllEmployeeCount=async(req,res)=>{
+  try {
+      const count = await Scores.countDocuments();
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching employee count' });
+    }
+}

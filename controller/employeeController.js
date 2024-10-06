@@ -20,14 +20,7 @@ exports. addEmployee = async (req, res) => {
 };
 
 //get Employee Count Controller
-exports. getAllEmployeeCount=async(req,res)=>{
-    try {
-        const count = await Employees.countDocuments();
-        res.json({ count });
-      } catch (error) {
-        res.status(500).json({ message: 'Error fetching employee count' });
-      }
-}
+
 
 //get All Employees
 exports. getAllEmployees = async (req, res) => {

@@ -5,7 +5,7 @@ const trainingSchema = new mongoose.Schema({
   Training_id: { type: String, unique: true, required: true },
   Training_name: { type: String, required: true }, 
   Trainer_name:{type:String,required:true},
-  progress: { type: String, required: true, default: 'In progress' } 
+  progress: { type: String, required: true, default: 'In Progress' } 
 });
 
 // Create the Training model

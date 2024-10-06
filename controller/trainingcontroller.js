@@ -21,14 +21,23 @@ exports.addTraining = async (req, res) => {
 };
 
 //Get Training Count
-exports.getAllTrainingCount=async(req,res)=>{
-    try {
-        const count = await Training.countDocuments();
-        res.json({ count });
-      } catch (error) {
-        res.status(500).json({ message: 'Error fetching training count' });
-      }
-}
+exports.getProgressTrainingCount = async (req, res) => {
+  try {
+    const count = await Training.countDocuments({ progress: 'In Progress' });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching training count' });
+  }
+};
+
+exports.getCompletedTrainingCount = async (req, res) => {
+  try {
+    const count = await Training.countDocuments({ progress: 'in progress' });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching training count' });
+  }
+};
 
 // Get Trainers Count
 exports.getAllTrainersCount=async(req,res)=>{
@@ -135,3 +144,23 @@ exports. editTraining = async (req, res) => {
   }
 };
 
+
+// Controller to delete a training by ID
+exports. deleteTraining = async (req, res) => {
+  try {
+    const { id } = req.params; // Get the Training_id from the request parameters
+
+    // Find the training by Training_id and delete it
+    const deletedTraining = await Training.findOneAndDelete({ Training_id: id });
+
+    if (!deletedTraining) {
+      return res.status(404).json({ message: 'Training not found' });
+    }
+
+    // Send a success response
+    res.status(200).json({ message: 'Training deleted successfully', deletedTraining });
+  } catch (error) {
+    // Handle errors and send a response
+    res.status(500).json({ message: 'Error deleting training', error: error.message });
+  }
+};
