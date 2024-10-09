@@ -32,7 +32,7 @@ exports.getProgressTrainingCount = async (req, res) => {
 
 exports.getCompletedTrainingCount = async (req, res) => {
   try {
-    const count = await Training.countDocuments({ progress: 'in progress' });
+    const count = await Training.countDocuments({ progress: 'Completed' });
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching training count' });
