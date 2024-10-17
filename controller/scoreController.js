@@ -22,11 +22,11 @@ exports.enterTrainingScore = async (req, res) => {
       Training_id: Training_id,
       Training_name: Training_name,
       Trainer_name: Trainer_name,
-      project_scores,
-      comments,
-      time,
-      requirements,
-      hackerrank,
+      project_scores:project_scores,
+      comments:comments,
+      time:time,
+      requirements:requirements,
+      hackerrank:hackerrank,
     });
     await score.save(); // Save the score information
     res.status(201).json({
