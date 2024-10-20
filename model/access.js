@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 //Scores Schema
 const accessSchema = new mongoose.Schema({
-  email: { type: String, unique: true },
+  email: { type: String, unique: true ,required:true},
   password: { type: String },
   role: { type: String, required: true },
 });
 
 //Scores model
-const Access = mongoose.model("Access", accessSchema);
+const Access = mongoose.model("Access", accessSchema, "accesses");
 
 module.exports = Access;

@@ -15,9 +15,13 @@ exports.addTraining = async (req, res) => {
     res.status(201).json(training);
   } catch (error) {
     console.error("Error adding training:", error);
-    res
-      .status(400)
-      .json({ message: "Failed to add training", error: error.message });
+
+    // Check for duplicate key error (E11000)
+    if (error.code === 11000 && error.keyPattern?.Training_id) {
+      return res.status(400).json({ message: "Training already exists" });
+    }
+
+    res.status(400).json({ message: "Failed to add training", error: error.message });
   }
 };
 
@@ -170,3 +174,19 @@ exports.deleteTraining = async (req, res) => {
       .json({ message: "Error deleting training", error: error.message });
   }
 };
+
+exports.checkTraining = async (req, res) => {
+  const { Training_id } = req.query; // Get Training_id from query parameters
+
+  try {
+      // Check if training with the given ID exists
+      const training = await Training.findOne({ Training_id });
+
+      // Return true if training exists, false if not
+      return res.status(200).json({ exists: !!training });
+  } catch (error) {
+      console.error('Error checking training:', error);
+      return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+

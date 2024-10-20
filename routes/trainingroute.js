@@ -10,4 +10,5 @@ router.get('/getAllTrainings',trainingController.getAllTrainings) //get all trai
 router.patch('/trainingprogress/:Training_id', trainingController.updateTrainingProgress)//update training progress
 router.patch('/editTraining/:Training_id',trainingController.editTraining)
 router.delete('/deleteTraining/:id',trainingController.deleteTraining)
+router.get('/checkTraining',trainingController.checkTraining)
 module.exports=router

@@ -7,5 +7,5 @@ const router = express.Router();
 // POST /login route
 router.post('/login', accessRoutes.login); //login
 router.post('/register',accessRoutes.createTrainer) //add trainers
-
+router.get('/checkTrainer',accessRoutes.checkTrainer)
 module.exports = router;

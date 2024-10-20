@@ -40,6 +40,7 @@ exports.login = async (req, res) => {
 };
 
 // Register Trainer
+// Create Trainer function
 exports.createTrainer = async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -54,6 +55,32 @@ exports.createTrainer = async (req, res) => {
     res.status(201).json({ message: "Trainer created successfully" });
   } catch (error) {
     console.error("Error creating Trainer:", error);
+
+    // Check for duplicate key error (E11000)
+    if (error.code === 11000 && error.keyPattern?.email) {
+      return res.status(400).json({ message: "Trainer already exists" });
+    }
+
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.checkTrainer = async (req, res) => {
+  const { email } = req.query; // Get email from query parameters
+  console.log('Checking for trainer with email:', email); // Debugging line
+
+  try {
+      // Check if a trainer with the given email exists
+      const trainer = await Access.findOne({ email });
+
+      console.log('Trainer found:', trainer); // Debugging line
+
+      // Return true if trainer exists, false if not
+      return res.status(200).json({ exists: !!trainer }); 
+  } catch (error) {
+      console.error('Error checking trainer:', error);
+      return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+
